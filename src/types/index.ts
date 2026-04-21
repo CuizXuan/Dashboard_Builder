@@ -129,3 +129,14 @@ export interface UIState {
 export interface CacheState {
   datasets: Record<string, UnifiedDataset>
 }
+
+// ============================================================
+// 主题类型
+// ============================================================
+
+export type ThemeName = 'light-business' | 'dark-tech' | 'light-fresh'
+
+export interface ThemeConfig {
+  name: ThemeName
+  label: string
+}

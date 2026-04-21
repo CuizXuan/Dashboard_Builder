@@ -4,9 +4,13 @@ import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
+import { useThemeStore, initTheme } from './store/useThemeStore'
 import './styles/global.css'
 
 const queryClient = new QueryClient()
+
+// 应用启动时初始化主题
+initTheme(useThemeStore.getState().theme)
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

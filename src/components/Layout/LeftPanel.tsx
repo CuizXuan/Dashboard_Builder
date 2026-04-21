@@ -21,7 +21,7 @@ interface AddDataSourceForm {
   pollInterval?: number
 }
 
-export default function LeftPanel({ collapsed }: { collapsed: boolean }) {
+export default function LeftPanel({ collapsed, onClose }: { collapsed: boolean; onClose?: () => void }) {
   const { dataSources, addDataSource, updateDataSource, removeDataSource } = useDashboardStore()
   const [modalOpen, setModalOpen] = useState(false)
   const [form] = Form.useForm<AddDataSourceForm>()
@@ -53,6 +53,7 @@ export default function LeftPanel({ collapsed }: { collapsed: boolean }) {
     }
     setModalOpen(false)
     form.resetFields()
+    onClose?.()
   }
 
   const handleTest = (ds: DataSource) => {
