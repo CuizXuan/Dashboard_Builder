@@ -1,0 +1,483 @@
+/* ============================================================
+   CSS 变量 — 与设计文档 02_UI设计方案 一致
+   ============================================================ */
+
+:root {
+  /* 背景色 */
+  --color-bg-page: #F0F2F5;
+  --color-bg-card: #FFFFFF;
+  --color-bg-hover: rgba(24, 144, 255, 0.05);
+
+  /* 主色调 */
+  --color-primary: #1890FF;
+  --color-primary-hover: #40a9ff;
+
+  /* 图表色板 */
+  --color-chart-1: #FF6B6B;
+  --color-chart-2: #FFD93D;
+  --color-chart-3: #6BCB77;
+  --color-chart-4: #4D96FF;
+  --color-chart-5: #9B59B6;
+  --color-chart-6: #E67E22;
+  --color-chart-7: #1ABC9C;
+  --color-chart-8: #34495E;
+
+  /* 文字 */
+  --color-text-primary: #262626;
+  --color-text-secondary: #595959;
+  --color-text-tertiary: #8C8C8C;
+
+  /* 边框 & 分割线 */
+  --color-border: #E8E8E8;
+  --color-divider: #F0F0F0;
+
+  /* 尺寸 */
+  --header-height: 48px;
+  --status-bar-height: 32px;
+  --left-panel-width: 240px;
+  --right-panel-width: 280px;
+
+  /* 阴影 */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-panel: 2px 0 8px rgba(0, 0, 0, 0.06);
+
+  /* 圆角 */
+  --radius-card: 8px;
+  --radius-inner: 4px;
+}
+
+/* ─── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── App 布局 ──────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.app-main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ────────────────────────────────────────────── */
+.app-header {
+  height: var(--header-height);
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.app-header__logo {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.app-header__title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.app-header__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ─── Left Panel ────────────────────────────────────────── */
+.app-left-panel {
+  width: var(--left-panel-width);
+  background: var(--color-bg-card);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.app-left-panel--collapsed {
+  width: 0;
+}
+
+.app-left-panel__header {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-divider);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.app-left-panel__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* ─── Right Panel ───────────────────────────────────────── */
+.app-right-panel {
+  width: var(--right-panel-width);
+  background: var(--color-bg-card);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.app-right-panel__header {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-divider);
+  flex-shrink: 0;
+}
+
+.app-right-panel__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* ─── Canvas ────────────────────────────────────────────── */
+.canvas {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  background: var(--color-bg-page);
+}
+
+/* react-grid-layout 样式 */
+.react-grid-layout {
+  min-height: 100%;
+}
+
+.react-grid-item {
+  transition: box-shadow 0.2s ease;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: var(--color-primary) !important;
+  opacity: 0.15 !important;
+  border-radius: var(--radius-card);
+}
+
+.react-resizable-handle {
+  background: none !important;
+}
+
+.react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--color-text-tertiary);
+  border-bottom: 2px solid var(--color-text-tertiary);
+}
+
+/* ─── Chart Card ────────────────────────────────────────── */
+.chart-card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.chart-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.chart-card--selected {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.chart-card__header {
+  height: 40px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-divider);
+  flex-shrink: 0;
+}
+
+.chart-card__title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chart-card__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.chart-card__body {
+  flex: 1;
+  padding: 12px;
+  overflow: hidden;
+  display: flex;
+  gap: 12px;
+  min-height: 0;
+}
+
+.chart-card__chart {
+  flex: 1;
+  min-width: 0;
+}
+
+.chart-card__legend {
+  width: 35%;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.chart-card__footer {
+  height: 32px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-divider);
+  flex-shrink: 0;
+}
+
+.chart-card__update-time {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.chart-card__footer-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* ─── Legend ────────────────────────────────────────────── */
+.legend-item {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: var(--radius-inner);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  gap: 8px;
+}
+
+.legend-item:hover {
+  background: var(--color-bg-hover);
+}
+
+.legend-item--hidden {
+  opacity: 0.4;
+}
+
+.legend-item__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-item__name {
+  flex: 1;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-item__value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.legend-item__percent {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ─── DataSource Panel ──────────────────────────────────── */
+.data-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.data-source-item {
+  padding: 10px 12px;
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.data-source-item:hover {
+  border-color: var(--color-primary);
+  background: var(--color-bg-hover);
+}
+
+.data-source-item__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-source-item__status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.data-source-item__status--online { background: #52c41a; }
+.data-source-item__status--offline { background: #8c8c8c; }
+.data-source-item__status--error { background: #ff4d4f; }
+
+.data-source-item__name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-source-item__type {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+/* ─── Status Bar ────────────────────────────────────────── */
+.app-status-bar {
+  height: var(--status-bar-height);
+  background: var(--color-bg-card);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.app-status-bar__item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-status-bar__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52c41a;
+}
+
+/* ─── Empty State ────────────────────────────────────────── */
+.canvas-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--color-text-tertiary);
+}
+
+.canvas-empty__icon {
+  font-size: 48px;
+  opacity: 0.4;
+}
+
+.canvas-empty__text {
+  font-size: 14px;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 1199px) {
+  .app-right-panel {
+    position: fixed;
+    right: 0;
+    top: var(--header-height);
+    bottom: var(--status-bar-height);
+    z-index: 99;
+    box-shadow: var(--shadow-panel);
+    transform: translateX(100%);
+    transition: transform 0.2s ease;
+  }
+
+  .app-right-panel--open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 767px) {
+  .app-left-panel {
+    position: fixed;
+    left: 0;
+    top: var(--header-height);
+    bottom: var(--status-bar-height);
+    z-index: 99;
+    box-shadow: var(--shadow-panel);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .app-left-panel--open {
+    transform: translateX(0);
+  }
+}
