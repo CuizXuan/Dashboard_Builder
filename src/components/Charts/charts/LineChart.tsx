@@ -1,4 +1,12 @@
-import type { ChartConfig } from '../../../types'
+import ReactEChartsCore from 'echarts-for-react/lib/core'
+import * as echarts from 'echarts/core'
+import { LineChart as LineChartType } from 'echarts/charts'
+import { GridComponent, TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import { useMemo } from 'react'
+import { CHART_COLORS, TOOLTIP_COMMON } from '../../../utils/chartConfig'
+
+echarts.use([LineChartType, GridComponent, TooltipComponent, CanvasRenderer])
 
 const DEMO_DATA = [
   { month: '1月', value: 42 },
@@ -9,39 +17,48 @@ const DEMO_DATA = [
   { month: '6月', value: 61 },
 ]
 
-export default function LineChart({ fullscreen }: { config: ChartConfig; fullscreen?: boolean }) {
-  const max = Math.max(...DEMO_DATA.map((d) => d.value))
-  const height = fullscreen ? 400 : 160
-
-  const points = DEMO_DATA.map((d, i) => ({
-    x: (i / (DEMO_DATA.length - 1)) * 100,
-    y: 100 - (d.value / max) * 80,
-  }))
-
-  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-  const areaD = `${pathD} L 100 100 L 0 100 Z`
+export default function LineChart({ fullscreen }: { config: unknown; fullscreen?: boolean }) {
+  const option = useMemo(() => ({
+    ...TOOLTIP_COMMON,
+    grid: { left: 40, right: 16, top: 16, bottom: 32 },
+    xAxis: {
+      type: 'category',
+      data: DEMO_DATA.map((d) => d.month),
+      axisLine: { lineStyle: { color: '#E8E8E8' } },
+      axisTick: { show: false },
+      axisLabel: { fontSize: 11, color: '#8C8C8C' },
+    },
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: '#F0F0F0', type: 'dashed' } },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { fontSize: 11, color: '#8C8C8C' },
+    },
+    series: [
+      {
+        type: 'line',
+        data: DEMO_DATA.map((d) => d.value),
+        smooth: 0.4,
+        symbol: 'circle',
+        symbolSize: 6,
+        lineStyle: { width: 2, color: CHART_COLORS[3] },
+        itemStyle: { color: CHART_COLORS[3], borderWidth: 2, borderColor: '#fff' },
+        areaStyle: {
+          color: {
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(77,150,255,0.18)' },
+              { offset: 1, color: 'rgba(77,150,255,0)' },
+            ],
+          },
+        },
+        emphasis: { scale: true, scaleSize: 10 },
+      },
+    ],
+  }), [fullscreen])
 
   return (
-    <div style={{ padding: '8px 0' }}>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height }}>
-        {/* 网格线 */}
-        {[25, 50, 75].map((y) => (
-          <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#E8E8E8" strokeDasharray="2" />
-        ))}
-        {/* 面积 */}
-        <path d={areaD} fill="rgba(24, 144, 255, 0.1)" />
-        {/* 折线 */}
-        <path d={pathD} fill="none" stroke="#1890FF" strokeWidth="2" strokeLinecap="round" />
-        {/* 数据点 */}
-        {points.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="3" fill="#1890FF" />
-        ))}
-      </svg>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 11, color: '#8C8C8C' }}>
-        {DEMO_DATA.map((d) => (
-          <span key={d.month}>{d.month}</span>
-        ))}
-      </div>
-    </div>
+    <ReactEChartsCore echarts={echarts} option={option} style={{ height: '100%', width: '100%' }} opts={{ renderer: 'canvas' }} />
   )
 }
