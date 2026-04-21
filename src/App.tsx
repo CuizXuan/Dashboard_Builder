@@ -2,7 +2,7 @@ import { useDashboardStore } from './store/useDashboardStore'
 import Header from './components/Layout/Header'
 import LeftPanel from './components/Layout/LeftPanel'
 import Canvas from './components/Layout/Canvas'
-import RightPanel from './components/Layout/RightPanel'
+import RightPanel from './components/RightPanel/RightPanel'
 import StatusBar from './components/Layout/StatusBar'
 
 export default function App() {
