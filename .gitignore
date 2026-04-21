@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+dist/
+*.spec
+*.exe
+
+# Temp files
+*.txt
+test_*.txt
+test_*.js
+m.txt
+bad_pdf.txt
+pdf_text_sample.txt
+test_out.txt
+test_err.txt
+test_path.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
