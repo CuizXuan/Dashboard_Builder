@@ -140,10 +140,13 @@ export const useDashboardStore = create<DashboardStore>()(
 
         // ── 画布 CRUD ──────────────────────────────────────
         createDashboard: (title) => {
-          const id = nanoid()
-          const dashboards = [...get().dashboards, createDashboard(title || `画布 ${get().dashboards.length + 1}`)]
-          set({ dashboards, activeDashboardId: id, ui: { ...get().ui, selectedCardId: null } })
-          return id
+          const newDashboard = createDashboard(title || `画布 ${get().dashboards.length + 1}`)
+          set((s) => ({
+            dashboards: [...s.dashboards, newDashboard],
+            activeDashboardId: newDashboard.id,
+            ui: { ...s.ui, selectedCardId: null },
+          }))
+          return newDashboard.id
         },
 
         removeDashboard: (id) => {
