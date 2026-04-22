@@ -180,7 +180,19 @@ body {
   flex: 1;
   overflow: auto;
   padding: 16px;
+  padding-bottom: 80px; /* 为固定底部按钮留空间 */
   background: var(--color-bg-page);
+}
+
+/* 固定底部添加按钮 */
+.canvas-fixed-add {
+  position: fixed;
+  bottom: calc(var(--status-bar-height) + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 24px;
 }
 
 /* react-grid-layout 样式 */

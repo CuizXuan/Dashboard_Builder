@@ -1,11 +1,11 @@
-import { Button, Space, Avatar, Input, Dropdown, message } from 'antd'
-import type { MenuProps } from 'antd'
+import { Button, Avatar, Input, Popover, message } from 'antd'
 import { ReloadOutlined, ExportOutlined, UserOutlined, BgColorsOutlined, MenuOutlined } from '@ant-design/icons'
+import { useState } from 'react'
 import { useDashboardStore } from '../../store/useDashboardStore'
 import { useThemeStore, type ThemeName } from '../../store/useThemeStore'
 import { useIsMobile } from '../../hooks/useBreakpoint'
 
-const THEME_ITEMS: MenuProps['items'] = [
+const THEMES = [
   { key: 'light-business', label: '🟦 浅色商务（默认）' },
   { key: 'dark-tech', label: '🌑 深色科技' },
   { key: 'light-fresh', label: '🟩 浅色清新' },
@@ -17,16 +17,18 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick }: HeaderProps) {
   const { dashboard, setDashboardTitle, setLastUpdate } = useDashboardStore()
-  const { setTheme } = useThemeStore()
+  const { theme, setTheme } = useThemeStore() as { theme: ThemeName; setTheme: (t: ThemeName) => void }
   const isMobile = useIsMobile()
+  const [themeOpen, setThemeOpen] = useState(false)
 
   const handleRefresh = () => {
     setLastUpdate(new Date().toLocaleTimeString('zh-CN'))
     message.success('已刷新')
   }
 
-  const handleThemeChange: MenuProps['onClick'] = ({ key }) => {
-    setTheme(key as ThemeName)
+  const handleThemeSelect = (key: ThemeName) => {
+    setTheme(key)
+    setThemeOpen(false)
     message.success('主题已切换')
   }
 
@@ -44,14 +46,33 @@ export default function Header({ onMenuClick }: HeaderProps) {
         style={{ maxWidth: 300 }}
       />
       <div className="app-header__actions">
-        <Space>
-          <Dropdown menu={{ items: THEME_ITEMS, onClick: handleThemeChange }} trigger={['click']}>
-            <Button icon={<BgColorsOutlined />} title="切换主题" />
-          </Dropdown>
-          <Button icon={<ReloadOutlined />} onClick={handleRefresh}>全局刷新</Button>
-          <Button icon={<ExportOutlined />}>导出报表</Button>
-          <Avatar size="small" icon={<UserOutlined />} />
-        </Space>
+        <Popover
+          open={themeOpen}
+          onOpenChange={setThemeOpen}
+          trigger="click"
+          placement="bottomRight"
+          content={
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 160 }}>
+              {THEMES.map((t) => (
+                <Button
+                  key={t.key}
+                  type={theme === t.key ? 'primary' : 'text'}
+                  size="small"
+                  block
+                  onClick={() => handleThemeSelect(t.key as ThemeName)}
+                  style={{ textAlign: 'left' }}
+                >
+                  {t.label}
+                </Button>
+              ))}
+            </div>
+          }
+        >
+          <Button icon={<BgColorsOutlined />} title="切换主题" />
+        </Popover>
+        <Button icon={<ReloadOutlined />} onClick={handleRefresh}>全局刷新</Button>
+        <Button icon={<ExportOutlined />}>导出报表</Button>
+        <Avatar size="small" icon={<UserOutlined />} />
       </div>
     </header>
   )
