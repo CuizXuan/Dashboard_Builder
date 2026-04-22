@@ -1,7 +1,7 @@
 import { Drawer } from 'antd'
 import { useState } from 'react'
 import { useDashboardStore } from './store/useDashboardStore'
-import Header from './components/Layout/Header'
+import Header, { TopRightToolbar } from './components/Layout/Header'
 import LeftPanel from './components/Layout/LeftPanel'
 import Canvas from './components/Layout/Canvas'
 import RightPanel from './components/RightPanel/RightPanel'
@@ -33,6 +33,7 @@ export default function App() {
 
         <main className="app-main">
           <Canvas />
+          <TopRightToolbar />
         </main>
 
         {!isMobile && <RightPanel />}

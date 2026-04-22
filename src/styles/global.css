@@ -195,6 +195,22 @@ body {
   border-radius: 24px;
 }
 
+/* 右上角悬浮工具栏 */
+.top-right-toolbar {
+  position: fixed;
+  top: calc(var(--header-height) + 16px);
+  right: 16px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: var(--shadow-card-hover);
+}
+
 /* react-grid-layout 样式 */
 .react-grid-layout {
   min-height: 100%;
