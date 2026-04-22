@@ -247,6 +247,24 @@ export const useDashboardStore = create<DashboardStore>()(
         dataSources: s.dataSources,
         lastUpdate: s.lastUpdate,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return
+        // 迁移旧版单 dashboard 结构
+        if (!state.dashboards || !Array.isArray(state.dashboards) || state.dashboards.length === 0) {
+          const old = (state as any).dashboard
+          if (old && old.id) {
+            state.dashboards = [old]
+            state.activeDashboardId = old.id
+          } else {
+            const nid = nanoid()
+            state.dashboards = [{ id: nid, title: '我的看板', cards: [], globalFilters: [] }]
+            state.activeDashboardId = nid
+          }
+        }
+        if (!state.activeDashboardId || !state.dashboards.find((d: any) => d.id === state.activeDashboardId)) {
+          state.activeDashboardId = state.dashboards[0].id
+        }
+      },
     }
   )
 )
