@@ -155,7 +155,7 @@ export const useDashboardStore = create<DashboardStore>()(
         set((s) => ({ dataSources: s.dataSources.filter((ds) => ds.id !== id) }))
       },
 
-      selectCard: (id) => set((s) => ({ ui: { ...s.ui, selectedCardId: id } })),
+      selectCard: (id) => set((s) => ({ ui: { ...s.ui, selectedCardId: id, rightPanelTab: 'data' } })),
       setRightPanelTab: (tab) => set((s) => ({ ui: { ...s.ui, rightPanelTab: tab } })),
       toggleLeftPanel: () => set((s) => ({ ui: { ...s.ui, isLeftPanelCollapsed: !s.ui.isLeftPanelCollapsed } })),
       setLoading: (loading) => set((s) => ({ ui: { ...s.ui, isLoading: loading } })),
