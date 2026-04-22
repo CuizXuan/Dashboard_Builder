@@ -6,9 +6,10 @@ import DataMappingPanel from './DataMappingPanel'
 import StylePanel from './StylePanel'
 
 export default function RightPanel() {
-  const { dashboard, ui, updateCard, undo, redo } = useDashboardStore()
+  const { dashboards, activeDashboardId, ui, updateCard, undo, redo } = useDashboardStore()
 
-  const selectedCard = dashboard.cards.find((c) => c.id === ui.selectedCardId) as Card | undefined
+  const dashboard = dashboards.find((d) => d.id === activeDashboardId)
+  const selectedCard = dashboard?.cards.find((c) => c.id === ui.selectedCardId) as Card | undefined
 
   // 键盘快捷键：Ctrl+Z 撤销，Ctrl+Shift+Z 重做
   useEffect(() => {

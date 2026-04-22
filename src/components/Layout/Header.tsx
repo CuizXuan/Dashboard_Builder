@@ -23,7 +23,8 @@ interface HeaderProps {
 }
 
 export default function Header({ onMenuClick }: HeaderProps) {
-  const { dashboard, setDashboardTitle } = useDashboardStore()
+  const { dashboards, activeDashboardId, renameDashboard } = useDashboardStore()
+  const dashboard = dashboards.find((d) => d.id === activeDashboardId)
   const isMobile = useIsMobile()
 
   return (
@@ -34,8 +35,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
       <span className="app-header__logo">📊</span>
       <Input
         className="app-header__title"
-        value={dashboard.title}
-        onChange={(e) => setDashboardTitle(e.target.value)}
+        value={dashboard?.title || ''}
+        onChange={(e) => {
+          if (dashboard) renameDashboard(dashboard.id, e.target.value)
+        }}
         variant="borderless"
         style={{ maxWidth: 300 }}
       />
@@ -46,7 +49,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
 /** 右上角悬浮工具栏 */
 export function TopRightToolbar() {
   const { theme, setTheme } = useThemeStore() as { theme: ThemeName; setTheme: (t: ThemeName) => void }
-  const { dashboard, dataSources, setLastUpdate } = useDashboardStore()
+  const { dashboards, activeDashboardId, dataSources, setLastUpdate } = useDashboardStore()
+  const dashboard = dashboards.find((d) => d.id === activeDashboardId)
   const [themeOpen, setThemeOpen] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
 
@@ -61,7 +65,7 @@ export function TopRightToolbar() {
       try {
         const el = document.querySelector('.canvas') as HTMLElement
         if (!el) { message.error('未找到画布'); return }
-        await exportElementToPng(el, `${dashboard.title || 'dashboard'}.png`)
+        await exportElementToPng(el, `${dashboard?.title || 'dashboard'}.png`)
         message.success('PNG 导出成功')
       } catch (e: unknown) {
         message.error('导出失败：' + (e as Error).message)
@@ -69,7 +73,7 @@ export function TopRightToolbar() {
         setExportLoading(false)
       }
     } else if (key === 'json') {
-      exportDashboardJson(dashboard, dataSources)
+      if (dashboard) exportDashboardJson(dashboard, dataSources)
       message.success('JSON 导出成功')
     } else if (key === 'import') {
       const data = await importDashboardJson()

@@ -20,7 +20,8 @@ const CHART_TYPE_OPTIONS: { type: ChartType; label: string; icon: React.ReactNod
 ]
 
 export default function Canvas() {
-  const { dashboard, addCard, updateCardLayout, selectCard, ui } = useDashboardStore()
+  const { dashboards, activeDashboardId, addCard, updateCardLayout, selectCard, ui } = useDashboardStore()
+  const dashboard = dashboards.find((d) => d.id === activeDashboardId)!
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [pendingPosition, setPendingPosition] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)

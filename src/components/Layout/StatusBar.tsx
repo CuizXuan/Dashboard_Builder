@@ -1,8 +1,9 @@
 import { useDashboardStore } from '../../store/useDashboardStore'
 
 export default function StatusBar() {
-  const { dashboard, lastUpdate } = useDashboardStore()
-  const cardCount = dashboard.cards.length
+  const { dashboards, activeDashboardId, lastUpdate } = useDashboardStore()
+  const dashboard = dashboards.find((d) => d.id === activeDashboardId)
+  const cardCount = dashboard?.cards.length || 0
 
   return (
     <footer className="app-status-bar">
