@@ -49,7 +49,7 @@ export interface Card {
 // 数据源类型
 // ============================================================
 
-export type DataSourceType = 'api' | 'graphql' | 'json' | 'websocket' | 'database'
+export type DataSourceType = 'api' | 'graphql' | 'json' | 'json-string' | 'excel' | 'websocket' | 'database'
 
 export type DataSourceStatus = 'online' | 'offline' | 'error'
 
@@ -58,7 +58,7 @@ export interface DataSource {
   name: string
   type: DataSourceType
   status: DataSourceStatus
-  config: ApiConfig | JsonConfig | DatabaseConfig | WebSocketConfig
+  config: ApiConfig | JsonConfig | JsonStringConfig | ExcelConfig | DatabaseConfig | WebSocketConfig
   pollInterval?: number        // 轮询间隔（毫秒），0表示不轮询
   lastUpdate?: string
 }
@@ -77,10 +77,21 @@ export interface JsonConfig {
   data: unknown
 }
 
+export interface JsonStringConfig {
+  jsonString: string           // 粘贴的 JSON 字符串
+}
+
+export interface ExcelConfig {
+  fileName: string             // 文件名
+  sheetIndex?: number          // 工作表索引，默认 0
+  hasHeader?: boolean          // 是否含表头，默认 true
+}
+
 export interface DatabaseConfig {
   connectionString: string
   sql: string
 }
+
 
 export interface WebSocketConfig {
   url: string

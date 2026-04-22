@@ -1,12 +1,14 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import type { UnifiedDataset, ApiConfig, JsonConfig } from '../types'
+import * as XLSX from 'xlsx'
+import type { UnifiedDataset, ApiConfig, JsonConfig, JsonStringConfig, ExcelConfig } from '../types'
 
-export function useDataSource(sourceId: string | undefined, config: ApiConfig | JsonConfig | undefined) {
+export function useDataSource(sourceId: string | undefined, config: ApiConfig | JsonConfig | JsonStringConfig | ExcelConfig | undefined) {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['datasource', sourceId],
     queryFn: async (): Promise<UnifiedDataset> => {
       if (!config) throw new Error('No config')
+
       if ('url' in config) {
         const headers: Record<string, string> = { ...config.headers }
         if (config.auth?.type === 'bearer' && config.auth.token) {
@@ -26,13 +28,20 @@ export function useDataSource(sourceId: string | undefined, config: ApiConfig | 
         } else {
           raw = await res.json()
         }
-        // JSONPath / 正则提取
         if (config.responsePath) {
           raw = extractByPath(raw, config.responsePath)
         }
         return normalizeData(raw, sourceId!)
       } else if ('data' in config) {
         return normalizeData(config.data, sourceId!)
+      } else if ('jsonString' in config) {
+        const parsed = JSON.parse(config.jsonString)
+        return normalizeData(parsed, sourceId!)
+      } else if ('fileName' in config) {
+        // Excel 数据从 stored fileData 中获取（文件内容存在 config 中）
+        const raw = (config as any)._fileData
+        if (!raw) throw new Error('Excel 文件数据未找到')
+        return normalizeData(raw, sourceId!)
       }
       throw new Error('Unknown config type')
     },
@@ -41,6 +50,30 @@ export function useDataSource(sourceId: string | undefined, config: ApiConfig | 
     retry: 2,
   })
   return { data, isLoading, error, refetch }
+}
+
+/** 解析 Excel 文件（ArrayBuffer）为目标数组 */
+export function parseExcel(buffer: ArrayBuffer, sheetIndex = 0, hasHeader = true): Record<string, unknown>[] {
+  const workbook = XLSX.read(buffer, { type: 'array' })
+  const sheetName = workbook.SheetNames[sheetIndex] || workbook.SheetNames[0]
+  const sheet = workbook.Sheets[sheetName]
+  if (hasHeader) {
+    const json: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet)
+    return json
+  } else {
+    // 无表头模式：读取所有行为字符串数组
+    const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1')
+    const result: Record<string, unknown>[] = []
+    for (let R = range.s.r; R <= range.e.r; R++) {
+      const obj: Record<string, unknown> = {}
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const cell = sheet[XLSX.utils.encode_cell({ r: R, c: C })]
+        obj[`列${C + 1}`] = cell ? cell.v : undefined
+      }
+      result.push(obj)
+    }
+    return result
+  }
 }
 
 /** 按 JSONPath 或 正则 提取数据 */
