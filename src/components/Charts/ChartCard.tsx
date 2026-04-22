@@ -33,6 +33,7 @@ export default function ChartCard({ card, isSelected, onClick }: ChartCardProps)
     message.success('图表已删除')
   }
 
+  // 下拉菜单 — 全部放在 footer，完全不受 GridLayout dragHandle 影响
   const menuItems = [
     { key: 'config', icon: <SettingOutlined />, label: '图表配置', onClick: () => { onClick() } },
     { key: 'fullscreen', icon: <FullscreenOutlined />, label: '全屏查看', onClick: () => setFullscreenOpen(true) },
@@ -42,58 +43,40 @@ export default function ChartCard({ card, isSelected, onClick }: ChartCardProps)
 
   return (
     <>
-      <div
-        className={`chart-card ${isSelected ? 'chart-card--selected' : ''}`}
-        onClick={onClick}
-      >
-        {/* 卡片头部 */}
+      {/* 最外层不加 onClick，避免和内部冲突 */}
+      <div className={`chart-card ${isSelected ? 'chart-card--selected' : ''}`}>
+
+        {/* 头部 — 仅标题，GridLayout dragHandle */}
         <div className="chart-card__header">
           <span className="chart-card__title">{chartConfig.title}</span>
-          <div className="chart-card__actions">
+        </div>
+
+        {/* 主体 — 点击选中卡片 */}
+        <div
+          className="chart-card__body"
+          onClick={(e) => { e.stopPropagation(); onClick() }}
+        >
+          <div className="chart-card__chart">
+            <ChartComponent config={chartConfig} />
+          </div>
+        </div>
+
+        {/* 底部 — 操作按钮 + 更多菜单 */}
+        <div className="chart-card__footer">
+          <span className="chart-card__update-time">
+            更新时间：{new Date().toLocaleTimeString('zh-CN')}
+          </span>
+          <div className="chart-card__footer-actions">
             <Dropdown
               menu={{ items: menuItems }}
               trigger={['click']}
-              placement="bottomRight"
+              placement="topRight"
             >
               <Button type="text" size="small" icon={<MoreOutlined />} />
             </Dropdown>
           </div>
         </div>
 
-        {/* 卡片主体 — 渲染对应图表 */}
-        <div className="chart-card__body">
-          <div className="chart-card__chart">
-            <ChartComponent config={chartConfig} />
-          </div>
-        </div>
-
-        {/* 卡片底部 */}
-        <div className="chart-card__footer">
-          <span className="chart-card__update-time">
-            更新时间：{new Date().toLocaleTimeString('zh-CN')}
-          </span>
-          <div className="chart-card__footer-actions">
-            <Button
-              type="text"
-              size="small"
-              icon={<SettingOutlined />}
-              title="图表配置"
-              onClick={(e) => { e.stopPropagation(); onClick() }}
-            />
-            <Button
-              type="text"
-              size="small"
-              icon={<ReloadOutlined />}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <Button
-              type="text"
-              size="small"
-              icon={<FullscreenOutlined />}
-              onClick={(e) => { e.stopPropagation(); setFullscreenOpen(true) }}
-            />
-          </div>
-        </div>
       </div>
 
       {/* 全屏弹窗 */}
