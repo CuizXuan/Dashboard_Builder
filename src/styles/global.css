@@ -104,7 +104,7 @@ body {
 .dashboard-tab {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 6px 8px;
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   border: 1px solid transparent;
@@ -113,6 +113,7 @@ body {
   white-space: nowrap;
   color: var(--color-text-secondary);
   font-size: 13px;
+  gap: 2px;
 }
 
 .dashboard-tab:hover {
@@ -127,25 +128,48 @@ body {
 }
 
 .dashboard-tab__title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 160px;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.dashboard-tab__edit {
+  font-size: 11px !important;
+  color: var(--color-text-tertiary) !important;
+  padding: 0 2px !important;
+  width: 20px !important;
+  height: 20px !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.dashboard-tab:hover .dashboard-tab__edit,
+.dashboard-tab--active .dashboard-tab__edit {
+  opacity: 1;
+}
+
+.dashboard-tab__edit:hover {
+  color: var(--color-primary) !important;
 }
 
 .dashboard-tab__close {
-  font-size: 10px;
-  opacity: 0.4;
-  flex-shrink: 0;
-  padding: 2px;
-  border-radius: 2px;
+  font-size: 11px !important;
+  color: var(--color-text-tertiary) !important;
+  padding: 0 2px !important;
+  width: 20px !important;
+  height: 20px !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.dashboard-tab:hover .dashboard-tab__close,
+.dashboard-tab--active .dashboard-tab__close {
+  opacity: 1;
 }
 
 .dashboard-tab__close:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.08);
+  color: #ff4d4f !important;
 }
 
 .dashboard-tabs__add {

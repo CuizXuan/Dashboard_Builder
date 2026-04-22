@@ -1,4 +1,4 @@
-import { Button, Input, Modal, message, Dropdown } from 'antd'
+import { Button, Input, Modal } from 'antd'
 import { PlusOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { useDashboardStore } from '../../store/useDashboardStore'
@@ -32,15 +32,8 @@ export default function DashboardTabs() {
 
   const handleRemove = (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (dashboards.length <= 1) {
-      message.warning('至少保留一个画布')
-      return
-    }
+    if (dashboards.length <= 1) return
     removeDashboard(id)
-  }
-
-  const handleAdd = () => {
-    createDashboard()
   }
 
   return (
@@ -55,29 +48,27 @@ export default function DashboardTabs() {
                 className={`dashboard-tab ${isActive ? 'dashboard-tab--active' : ''}`}
                 onClick={() => setActiveDashboard(d.id)}
               >
-                <Dropdown
-                  menu={{
-                    items: [
-                      { key: 'rename', icon: <EditOutlined />, label: '重命名', onClick: () => openRename(d.id, d.title) },
-                      { key: 'delete', icon: <CloseOutlined />, label: '删除', danger: true, onClick: () => { if (dashboards.length > 1) removeDashboard(d.id) } },
-                    ],
-                  }}
-                  trigger={['click']}
-                  placement="bottomLeft"
-                >
-                  <span
-                    className="dashboard-tab__title"
-                    onClick={(e) => { e.stopPropagation() }}
-                  >
-                    {d.title}
-                    {dashboards.length > 1 && (
-                      <CloseOutlined
-                        className="dashboard-tab__close"
-                        onClick={(e) => handleRemove(d.id, e)}
-                      />
-                    )}
-                  </span>
-                </Dropdown>
+                <span className="dashboard-tab__title">{d.title}</span>
+
+                {/* 左侧编辑按钮 */}
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined />}
+                  className="dashboard-tab__edit"
+                  onClick={(e) => { e.stopPropagation(); openRename(d.id, d.title) }}
+                />
+
+                {/* 右侧关闭按钮 */}
+                {dashboards.length > 1 && (
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<CloseOutlined />}
+                    className="dashboard-tab__close"
+                    onClick={(e) => handleRemove(d.id, e)}
+                  />
+                )}
               </div>
             )
           })}
@@ -85,7 +76,7 @@ export default function DashboardTabs() {
           <Button
             type="text"
             icon={<PlusOutlined />}
-            onClick={handleAdd}
+            onClick={() => createDashboard()}
             className="dashboard-tabs__add"
             title="新建画布"
           />
