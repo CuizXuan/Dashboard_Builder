@@ -1,4 +1,4 @@
-import { Tabs, Button, Input, Dropdown, Modal, message } from 'antd'
+import { Button, Input, Modal, message, Dropdown } from 'antd'
 import { PlusOutlined, CloseOutlined, EditOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { useDashboardStore } from '../../store/useDashboardStore'
@@ -17,19 +17,6 @@ export default function DashboardTabs() {
   const [renameTarget, setRenameTarget] = useState<{ id: string; title: string } | null>(null)
   const [newTitle, setNewTitle] = useState('')
 
-  const handleAdd = () => {
-    createDashboard()
-  }
-
-  const handleRemove = (id: string) => {
-    if (dashboards.length <= 1) {
-      message.warning('至少保留一个画布')
-      return
-    }
-    removeDashboard(id)
-    message.success('画布已删除')
-  }
-
   const openRename = (id: string, title: string) => {
     setRenameTarget({ id, title })
     setNewTitle(title)
@@ -43,48 +30,66 @@ export default function DashboardTabs() {
     setRenameTarget(null)
   }
 
-  const tabItems = dashboards.map((d) => ({
-    key: d.id,
-    label: (
-      <Dropdown
-        menu={{
-          items: [
-            { key: 'rename', icon: <EditOutlined />, label: '重命名', onClick: () => openRename(d.id, d.title) },
-            { key: 'delete', icon: <CloseOutlined />, label: '删除', danger: true, onClick: () => handleRemove(d.id) },
-          ],
-        }}
-        trigger={['contextMenu']}
-      >
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          {d.title}
-          {dashboards.length > 1 && (
-            <CloseOutlined
-              style={{ fontSize: 10, opacity: 0.5 }}
-              onClick={(e) => { e.stopPropagation(); handleRemove(d.id) }}
-            />
-          )}
-        </span>
-      </Dropdown>
-    ),
-  }))
+  const handleRemove = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (dashboards.length <= 1) {
+      message.warning('至少保留一个画布')
+      return
+    }
+    removeDashboard(id)
+  }
+
+  const handleAdd = () => {
+    createDashboard()
+  }
 
   return (
     <>
       <div className="dashboard-tabs">
-        <Tabs
-          activeKey={activeDashboardId}
-          onChange={setActiveDashboard}
-          type="editable-card"
-          hideAdd
-          items={tabItems}
-          tabBarExtraContent={
-            <Button type="text" icon={<PlusOutlined />} onClick={handleAdd} title="新建画布" size="small" />
-          }
-          onEdit={(id) => {
-            if (id === 'add') handleAdd()
-            else if (typeof id === 'string' && id !== activeDashboardId) handleRemove(id)
-          }}
-        />
+        <div className="dashboard-tabs__list">
+          {dashboards.map((d) => {
+            const isActive = d.id === activeDashboardId
+            return (
+              <div
+                key={d.id}
+                className={`dashboard-tab ${isActive ? 'dashboard-tab--active' : ''}`}
+                onClick={() => setActiveDashboard(d.id)}
+              >
+                <Dropdown
+                  menu={{
+                    items: [
+                      { key: 'rename', icon: <EditOutlined />, label: '重命名', onClick: () => openRename(d.id, d.title) },
+                      { key: 'delete', icon: <CloseOutlined />, label: '删除', danger: true, onClick: () => { if (dashboards.length > 1) removeDashboard(d.id) } },
+                    ],
+                  }}
+                  trigger={['click']}
+                  placement="bottomLeft"
+                >
+                  <span
+                    className="dashboard-tab__title"
+                    onClick={(e) => { e.stopPropagation() }}
+                  >
+                    {d.title}
+                    {dashboards.length > 1 && (
+                      <CloseOutlined
+                        className="dashboard-tab__close"
+                        onClick={(e) => handleRemove(d.id, e)}
+                      />
+                    )}
+                  </span>
+                </Dropdown>
+              </div>
+            )
+          })}
+
+          <Button
+            type="text"
+            icon={<PlusOutlined />}
+            onClick={handleAdd}
+            className="dashboard-tabs__add"
+            title="新建画布"
+          />
+        </div>
       </div>
 
       <Modal
