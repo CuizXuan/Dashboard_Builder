@@ -1,5 +1,5 @@
 import { Dropdown, Modal, Button, message } from 'antd'
-import { ReloadOutlined, FullscreenOutlined, MoreOutlined, DeleteOutlined } from '@ant-design/icons'
+import { ReloadOutlined, FullscreenOutlined, MoreOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { useDashboardStore } from '../../store/useDashboardStore'
 import type { Card } from '../../types'
@@ -34,6 +34,7 @@ export default function ChartCard({ card, isSelected, onClick }: ChartCardProps)
   }
 
   const menuItems = [
+    { key: 'config', icon: <SettingOutlined />, label: '图表配置', onClick: () => { onClick() } },
     { key: 'fullscreen', icon: <FullscreenOutlined />, label: '全屏查看', onClick: () => setFullscreenOpen(true) },
     { key: 'refresh', icon: <ReloadOutlined />, label: '刷新数据' },
     { key: 'delete', icon: <DeleteOutlined />, label: '删除', danger: true, onClick: handleDelete },
@@ -49,6 +50,7 @@ export default function ChartCard({ card, isSelected, onClick }: ChartCardProps)
         <div className="chart-card__header">
           <span className="chart-card__title">{chartConfig.title}</span>
           <div className="chart-card__actions">
+            <Button type="text" size="small" icon={<SettingOutlined />} title="图表配置" onClick={(e) => { e.stopPropagation(); onClick() }} />
             <Dropdown
               menu={{ items: menuItems }}
               trigger={['click']}
@@ -72,6 +74,13 @@ export default function ChartCard({ card, isSelected, onClick }: ChartCardProps)
             更新时间：{new Date().toLocaleTimeString('zh-CN')}
           </span>
           <div className="chart-card__footer-actions">
+            <Button
+              type="text"
+              size="small"
+              icon={<SettingOutlined />}
+              title="图表配置"
+              onClick={(e) => { e.stopPropagation(); onClick() }}
+            />
             <Button
               type="text"
               size="small"
