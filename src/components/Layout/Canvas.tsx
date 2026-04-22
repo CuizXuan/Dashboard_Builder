@@ -1,5 +1,5 @@
 import { Button, Modal } from 'antd'
-import { BarChartOutlined, LineChartOutlined, PieChartOutlined, TableOutlined, PlusOutlined } from '@ant-design/icons'
+import { BarChartOutlined, LineChartOutlined, PieChartOutlined, TableOutlined, PlusOutlined, DotChartOutlined, RiseOutlined, DashboardOutlined, HeatMapOutlined } from '@ant-design/icons'
 import { useState, useRef, useEffect } from 'react'
 import GridLayout from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
@@ -13,6 +13,10 @@ const CHART_TYPE_OPTIONS: { type: ChartType; label: string; icon: React.ReactNod
   { type: 'line', label: '折线图', icon: <LineChartOutlined /> },
   { type: 'bar', label: '柱状图', icon: <BarChartOutlined /> },
   { type: 'table', label: '表格', icon: <TableOutlined /> },
+  { type: 'scatter', label: '散点图', icon: <DotChartOutlined /> },
+  { type: 'radar', label: '雷达图', icon: <RiseOutlined /> },
+  { type: 'gauge', label: '仪表盘', icon: <DashboardOutlined /> },
+  { type: 'heatmap', label: '热力图', icon: <HeatMapOutlined /> },
 ]
 
 export default function Canvas() {

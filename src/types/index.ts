@@ -2,7 +2,7 @@
 // 图表相关类型
 // ============================================================
 
-export type ChartType = 'pie' | 'line' | 'bar' | 'table'
+export type ChartType = 'pie' | 'line' | 'bar' | 'table' | 'scatter' | 'radar' | 'gauge' | 'heatmap'
 
 export interface DataMapping {
   dimensionField: string      // 维度字段（X轴/分类）

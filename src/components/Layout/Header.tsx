@@ -1,14 +1,21 @@
-import { Button, Avatar, Input, Popover, message, Tooltip } from 'antd'
-import { ReloadOutlined, ExportOutlined, UserOutlined, BgColorsOutlined, MenuOutlined } from '@ant-design/icons'
+import { Button, Avatar, Input, Popover, message, Tooltip, Dropdown } from 'antd'
+import { ReloadOutlined, ExportOutlined, UserOutlined, BgColorsOutlined, MenuOutlined, FolderOpenOutlined, DownloadOutlined, CameraOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import { useDashboardStore } from '../../store/useDashboardStore'
 import { useThemeStore, type ThemeName } from '../../store/useThemeStore'
 import { useIsMobile } from '../../hooks/useBreakpoint'
+import { exportElementToPng, exportDashboardJson, importDashboardJson } from '../../utils/export'
 
 const THEMES = [
   { key: 'light-business', label: '🟦 浅色商务（默认）' },
   { key: 'dark-tech', label: '🌑 深色科技' },
   { key: 'light-fresh', label: '🟩 浅色清新' },
+]
+
+const EXPORT_ITEMS = [
+  { key: 'png', icon: <CameraOutlined />, label: '导出为 PNG 图片' },
+  { key: 'json', icon: <DownloadOutlined />, label: '导出为 JSON（配置备份）' },
+  { key: 'import', icon: <FolderOpenOutlined />, label: '导入 JSON' },
 ]
 
 interface HeaderProps {
@@ -39,12 +46,36 @@ export default function Header({ onMenuClick }: HeaderProps) {
 /** 右上角悬浮工具栏 */
 export function TopRightToolbar() {
   const { theme, setTheme } = useThemeStore() as { theme: ThemeName; setTheme: (t: ThemeName) => void }
-  const { setLastUpdate } = useDashboardStore()
+  const { dashboard, dataSources, setLastUpdate } = useDashboardStore()
   const [themeOpen, setThemeOpen] = useState(false)
+  const [exportLoading, setExportLoading] = useState(false)
 
   const handleRefresh = () => {
     setLastUpdate(new Date().toLocaleTimeString('zh-CN'))
     message.success('已刷新')
+  }
+
+  const handleExport = async (key: string) => {
+    if (key === 'png') {
+      setExportLoading(true)
+      try {
+        const el = document.querySelector('.canvas') as HTMLElement
+        if (!el) { message.error('未找到画布'); return }
+        await exportElementToPng(el, `${dashboard.title || 'dashboard'}.png`)
+        message.success('PNG 导出成功')
+      } catch (e: unknown) {
+        message.error('导出失败：' + (e as Error).message)
+      } finally {
+        setExportLoading(false)
+      }
+    } else if (key === 'json') {
+      exportDashboardJson(dashboard, dataSources)
+      message.success('JSON 导出成功')
+    } else if (key === 'import') {
+      const data = await importDashboardJson()
+      if (!data) { message.error('导入失败，请检查文件格式'); return }
+      message.success('导入成功')
+    }
   }
 
   return (
@@ -80,9 +111,15 @@ export function TopRightToolbar() {
         <Button icon={<ReloadOutlined />} onClick={handleRefresh} />
       </Tooltip>
 
-      <Tooltip title="导出报表" placement="left">
-        <Button icon={<ExportOutlined />} />
-      </Tooltip>
+      <Dropdown
+        menu={{ items: EXPORT_ITEMS.map((i) => ({ ...i, onClick: () => handleExport(i.key) })) }}
+        trigger={['click']}
+        placement="bottomRight"
+      >
+        <Tooltip title="导出报表" placement="left">
+          <Button icon={<ExportOutlined />} loading={exportLoading} />
+        </Tooltip>
+      </Dropdown>
 
       <Tooltip title="个人信息" placement="left">
         <Avatar size="small" icon={<UserOutlined />} />

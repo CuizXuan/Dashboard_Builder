@@ -7,12 +7,20 @@ import PieChart from './charts/PieChart'
 import LineChart from './charts/LineChart'
 import BarChart from './charts/BarChart'
 import TableChart from './charts/TableChart'
+import ScatterChart from './charts/ScatterChart'
+import RadarChart from './charts/RadarChart'
+import GaugeChart from './charts/GaugeChart'
+import HeatmapChart from './charts/HeatmapChart'
 
 const CHART_MAP = {
   pie: PieChart,
   line: LineChart,
   bar: BarChart,
   table: TableChart,
+  scatter: ScatterChart,
+  radar: RadarChart,
+  gauge: GaugeChart,
+  heatmap: HeatmapChart,
 }
 
 interface ChartCardProps {
