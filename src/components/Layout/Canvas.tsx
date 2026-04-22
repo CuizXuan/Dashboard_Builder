@@ -1,6 +1,6 @@
 import { Button, Modal } from 'antd'
 import { BarChartOutlined, LineChartOutlined, PieChartOutlined, TableOutlined, PlusOutlined } from '@ant-design/icons'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import GridLayout from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
@@ -19,6 +19,21 @@ export default function Canvas() {
   const { dashboard, addCard, updateCardLayout, selectCard, ui } = useDashboardStore()
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [pendingPosition, setPendingPosition] = useState({ x: 0, y: 0 })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [containerWidth, setContainerWidth] = useState(1200)
+
+  // 响应容器宽度变化
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width)
+      }
+    })
+    observer.observe(containerRef.current)
+    setContainerWidth(containerRef.current.offsetWidth)
+    return () => observer.disconnect()
+  }, [])
 
   const handleAddChart = (type: ChartType) => {
     addCard(type, pendingPosition.x, pendingPosition.y)
@@ -49,7 +64,7 @@ export default function Canvas() {
   }
 
   return (
-    <div className="canvas" onClick={handleCanvasClick} style={{ position: 'relative' }}>
+    <div className="canvas" onClick={handleCanvasClick} style={{ position: 'relative' }} ref={containerRef}>
       {dashboard.cards.length === 0 ? (
         <div className="canvas-empty">
           <div className="canvas-empty__icon">📊</div>
@@ -61,11 +76,13 @@ export default function Canvas() {
           layout={dashboard.cards.map((c) => ({ i: c.id, x: c.x, y: c.y, w: c.w, h: c.h }))}
           cols={12}
           rowHeight={80}
-          width={1200}
+          width={containerWidth}
           onLayoutChange={handleLayoutChange}
           draggableHandle=".chart-card__header"
           isResizable
           isDraggable
+          margin={[12, 12]}
+          containerPadding={[0, 0]}
         >
           {dashboard.cards.map((card) => (
             <div key={card.id}>
