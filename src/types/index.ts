@@ -68,6 +68,9 @@ export interface ApiConfig {
   method: 'GET' | 'POST'
   headers?: Record<string, string>
   auth?: { type: 'bearer' | 'basic'; token?: string }
+  body?: string                       // 请求体（POST 时用）
+  responsePath?: string               // JSONPath 提取路径，如 $.data.items
+  responseType?: 'json' | 'text'      // 响应类型，默认 json
 }
 
 export interface JsonConfig {

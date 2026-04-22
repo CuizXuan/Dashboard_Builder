@@ -8,12 +8,28 @@ export function useDataSource(sourceId: string | undefined, config: ApiConfig | 
     queryFn: async (): Promise<UnifiedDataset> => {
       if (!config) throw new Error('No config')
       if ('url' in config) {
+        const headers: Record<string, string> = { ...config.headers }
+        if (config.auth?.type === 'bearer' && config.auth.token) {
+          headers['Authorization'] = `Bearer ${config.auth.token}`
+        } else if (config.auth?.type === 'basic') {
+          headers['Authorization'] = `Basic ${btoa(config.auth.token || '')}`
+        }
         const res = await fetch(config.url, {
           method: config.method || 'GET',
-          headers: config.headers,
+          headers,
+          body: config.method === 'POST' ? (config.body || undefined) : undefined,
         })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const raw = await res.json()
+        let raw: unknown
+        if (config.responseType === 'text') {
+          raw = await res.text()
+        } else {
+          raw = await res.json()
+        }
+        // JSONPath / 正则提取
+        if (config.responsePath) {
+          raw = extractByPath(raw, config.responsePath)
+        }
         return normalizeData(raw, sourceId!)
       } else if ('data' in config) {
         return normalizeData(config.data, sourceId!)
@@ -25,6 +41,35 @@ export function useDataSource(sourceId: string | undefined, config: ApiConfig | 
     retry: 2,
   })
   return { data, isLoading, error, refetch }
+}
+
+/** 按 JSONPath 或 正则 提取数据 */
+function extractByPath(raw: unknown, path: string): unknown {
+  // 正则格式：/pattern/ 或 /pattern/flags
+  const regexMatch = path.match(/^\/([^/]+)\/([gimsuy]*)$/)
+  if (regexMatch) {
+    const str = JSON.stringify(raw)
+    const re = new RegExp(regexMatch[1], regexMatch[2])
+    const matches = str.match(re)
+    if (!matches) return []
+    // 如果正则有捕获组，返回捕获结果；否则返回匹配文本列表
+    if (re.global) return matches
+    return matches[0]
+  }
+  // JSONPath 简化实现（支持 $.data.items 或 $.data[*].name）
+  const segments = path.replace(/^\$\.?/, '').split('.')
+  let current: unknown = raw
+  for (const seg of segments) {
+    if (current == null) return []
+    if (seg === '*' || seg === '[*]') {
+      current = Array.isArray(current) ? current : Object.values(current as Record<string, unknown>)
+    } else if (typeof current === 'object') {
+      current = (current as Record<string, unknown>)[seg]
+    } else {
+      return []
+    }
+  }
+  return Array.isArray(current) ? current : [current]
 }
 
 function normalizeData(raw: unknown, sourceId: string): UnifiedDataset {

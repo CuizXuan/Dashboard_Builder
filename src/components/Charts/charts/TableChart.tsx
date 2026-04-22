@@ -1,20 +1,34 @@
+import { Empty } from 'antd'
 import type { ChartConfig } from '../../../types'
+import { useDashboardStore } from '../../../store/useDashboardStore'
+import { useDataSource } from '../../../hooks/useDataSource'
 
-const DEMO_DATA = [
-  { name: '联合调度决策/防洪调度', module: '调度模块', count: 27, resolved: 22 },
-  { name: '水库优化调度', module: '水库模块', count: 21, resolved: 18 },
-  { name: '航道应急保障', module: '航道模块', count: 18, resolved: 15 },
-  { name: '水资源配置', module: '配置模块', count: 15, resolved: 12 },
-  { name: '其他', module: '通用模块', count: 24, resolved: 20 },
-]
+export default function TableChart({ config }: { config: ChartConfig; fullscreen?: boolean }) {
+  const { dataSources } = useDashboardStore()
 
-export default function TableChart({}: { config: ChartConfig; fullscreen?: boolean }) {
+  const selectedDs = dataSources.find((ds) => ds.id === (config.dataMapping as any).sourceId)
+  const { data: dataset } = useDataSource(
+    (config.dataMapping as any).sourceId,
+    selectedDs?.config as any
+  )
+
+  if (!dataset || dataset.data.length === 0) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-tertiary)' }}>
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="请先配置数据源" />
+      </div>
+    )
+  }
+
+  const columns = dataset.dimensions.map((d) => d.name)
+  const rows = dataset.data.slice(0, config.limit || 20)
+
   return (
     <div style={{ height: '100%', overflow: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
         <thead>
           <tr style={{ background: '#FAFAFA', borderBottom: '2px solid #1890FF' }}>
-            {['名称', '模块', '数量', '已解决', '解决率'].map((col) => (
+            {columns.map((col) => (
               <th key={col} style={{ padding: '8px 12px', textAlign: 'left', color: '#262626', fontWeight: 500 }}>
                 {col}
               </th>
@@ -22,21 +36,19 @@ export default function TableChart({}: { config: ChartConfig; fullscreen?: boole
           </tr>
         </thead>
         <tbody>
-          {DEMO_DATA.map((row, i) => (
+          {rows.map((row, i) => (
             <tr
-              key={row.name}
+              key={i}
               style={{
                 borderBottom: '1px solid #F0F0F0',
                 background: i % 2 === 0 ? 'white' : '#FAFAFA',
               }}
             >
-              <td style={{ padding: '10px 12px', color: '#595959' }}>{row.name}</td>
-              <td style={{ padding: '10px 12px', color: '#595959' }}>{row.module}</td>
-              <td style={{ padding: '10px 12px', fontWeight: 600, color: '#262626' }}>{row.count}</td>
-              <td style={{ padding: '10px 12px', color: '#595959' }}>{row.resolved}</td>
-              <td style={{ padding: '10px 12px', color: '#8C8C8C' }}>
-                {((row.resolved / row.count) * 100).toFixed(1)}%
-              </td>
+              {columns.map((col) => (
+                <td key={col} style={{ padding: '10px 12px', color: '#595959' }}>
+                  {String(row[col] ?? '-')}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>

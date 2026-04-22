@@ -1,6 +1,7 @@
-import { Dropdown, Modal, Button } from 'antd'
+import { Dropdown, Modal, Button, message } from 'antd'
 import { ReloadOutlined, FullscreenOutlined, MoreOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useState } from 'react'
+import { useDashboardStore } from '../../store/useDashboardStore'
 import type { Card } from '../../types'
 import PieChart from './charts/PieChart'
 import LineChart from './charts/LineChart'
@@ -23,13 +24,19 @@ interface ChartCardProps {
 export default function ChartCard({ card, isSelected, onClick }: ChartCardProps) {
   const { chartConfig } = card
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
+  const { removeCard } = useDashboardStore()
 
   const ChartComponent = CHART_MAP[chartConfig.type]
+
+  const handleDelete = () => {
+    removeCard(card.id)
+    message.success('图表已删除')
+  }
 
   const menuItems = [
     { key: 'fullscreen', icon: <FullscreenOutlined />, label: '全屏查看', onClick: () => setFullscreenOpen(true) },
     { key: 'refresh', icon: <ReloadOutlined />, label: '刷新数据' },
-    { key: 'delete', icon: <DeleteOutlined />, label: '删除', danger: true },
+    { key: 'delete', icon: <DeleteOutlined />, label: '删除', danger: true, onClick: handleDelete },
   ]
 
   return (
