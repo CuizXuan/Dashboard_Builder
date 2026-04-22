@@ -50,13 +50,12 @@ export default function ChartCard({ card, isSelected, onClick }: ChartCardProps)
         <div className="chart-card__header">
           <span className="chart-card__title">{chartConfig.title}</span>
           <div className="chart-card__actions">
-            <Button type="text" size="small" icon={<SettingOutlined />} title="图表配置" onClick={(e) => { e.stopPropagation(); onClick() }} />
             <Dropdown
               menu={{ items: menuItems }}
               trigger={['click']}
               placement="bottomRight"
             >
-              <Button type="text" size="small" icon={<MoreOutlined />} onClick={(e) => e.stopPropagation()} />
+              <Button type="text" size="small" icon={<MoreOutlined />} />
             </Dropdown>
           </div>
         </div>
