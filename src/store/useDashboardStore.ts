@@ -1,6 +1,51 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
 import type { Card, DataSource, ChartConfig, ChartType } from '../types'
+
+const SHARED_STATE_ENDPOINT = '/api/dashboard-state'
+let resolveStorageReady: (() => void) | undefined
+let storageReadyResolved = false
+const storageReady = new Promise<void>((resolve) => {
+  resolveStorageReady = resolve
+})
+
+function markStorageReady() {
+  if (storageReadyResolved) return
+  storageReadyResolved = true
+  resolveStorageReady?.()
+}
+
+/**
+ * 使用开发服务器中的 JSON 文件保存看板状态，而不是浏览器 localStorage。
+ * 因而同一台机器上通过不同浏览器访问本地地址时会读取同一份数据。
+ */
+const sharedFileStorage: StateStorage = {
+  async getItem() {
+    try {
+      const response = await fetch(SHARED_STATE_ENDPOINT)
+      if (response.status === 404) return null
+      if (!response.ok) throw new Error('读取共享看板状态失败')
+      return response.text()
+    } finally {
+      // 防止应用默认状态在异步水合完成前覆盖服务端已有的看板文件。
+      markStorageReady()
+    }
+  },
+  async setItem(_name, value) {
+    await storageReady
+    const response = await fetch(SHARED_STATE_ENDPOINT, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: value,
+    })
+    if (!response.ok) throw new Error('保存共享看板状态失败')
+  },
+  async removeItem() {
+    await storageReady
+    const response = await fetch(SHARED_STATE_ENDPOINT, { method: 'DELETE' })
+    if (!response.ok) throw new Error('删除共享看板状态失败')
+  },
+}
 
 function nanoid() {
   return Math.random().toString(36).slice(2, 10)
@@ -19,7 +64,7 @@ function createDefaultChartConfig(type: ChartType): ChartConfig {
   return {
     type,
     title: '新图表',
-    dataMapping: { dimensionField: '', measureField: '', aggregation: 'sum' },
+    dataMapping: { dimensionField: '', measureField: '', aggregation: 'count' },
     filters: [],
     sortBy: 'value_desc',
     limit: 10,
@@ -244,6 +289,7 @@ export const useDashboardStore = create<DashboardStore>()(
     },
     {
       name: 'dashboard-builder-storage',
+      storage: createJSONStorage(() => sharedFileStorage),
       partialize: (s) => ({
         dashboards: s.dashboards,
         activeDashboardId: s.activeDashboardId,

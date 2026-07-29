@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "seed:dashboard": "node scripts/generate-dashboard-state.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

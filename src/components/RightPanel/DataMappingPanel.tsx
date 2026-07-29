@@ -79,18 +79,6 @@ export default function DataMappingPanel({ card, onUpdate }: Props) {
           </div>
 
           <div>
-            <label style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginBottom: 4, display: 'block' }}>度量字段（数值）</label>
-            <Select
-              style={{ width: '100%' }}
-              placeholder="选择度量字段"
-              allowClear
-              value={dataMapping.measureField || undefined}
-              onChange={(val) => handleFieldChange('measureField', val || '')}
-              options={fields.filter((f: any) => (f as any).type === 'number').map((f) => ({ value: f.name, label: f.name }))}
-            />
-          </div>
-
-          <div>
             <label style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginBottom: 4, display: 'block' }}>聚合方式</label>
             <Select
               style={{ width: '100%' }}
@@ -105,6 +93,24 @@ export default function DataMappingPanel({ card, onUpdate }: Props) {
               ]}
             />
           </div>
+
+          {dataMapping.aggregation === 'count' ? (
+            <div style={{ fontSize: 12, color: 'var(--color-text-tertiary)', padding: '8px 10px', background: '#F5F5F5', borderRadius: 4 }}>
+              按每个维度值出现的记录数统计，无需选择度量字段。
+            </div>
+          ) : (
+            <div>
+              <label style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginBottom: 4, display: 'block' }}>度量字段（数值）</label>
+              <Select
+                style={{ width: '100%' }}
+                placeholder="选择度量字段"
+                allowClear
+                value={dataMapping.measureField || undefined}
+                onChange={(val) => handleFieldChange('measureField', val || '')}
+                options={fields.filter((f: any) => (f as any).type === 'number').map((f) => ({ value: f.name, label: f.name }))}
+              />
+            </div>
+          )}
         </>
       ) : (
         <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--color-text-tertiary)', fontSize: 13 }}>

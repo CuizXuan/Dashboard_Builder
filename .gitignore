@@ -1,4 +1,6 @@
 node_modules/
+data/dashboard-state.json
+data/dashboard-state.json.*.tmp
 dist/
 build/
 .env

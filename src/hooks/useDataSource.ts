@@ -136,14 +136,19 @@ export function useChartData(
   limit: number
 ) {
   return useMemo(() => {
-    if (!dataset || !dimensionField || !measureField) return []
+    if (!dataset || !dimensionField || (aggregation !== 'count' && !measureField)) return []
 
     const grouped: Record<string, number> = {}
     for (const row of dataset.data) {
       const key = String(row[dimensionField] ?? '未知')
-      const val = Number(row[measureField] ?? 0)
       if (!grouped[key]) grouped[key] = 0
-      if (aggregation === 'sum' || aggregation === 'count') grouped[key] += aggregation === 'count' ? 1 : val
+      if (aggregation === 'count') {
+        grouped[key] += 1
+        continue
+      }
+
+      const val = Number(row[measureField] ?? 0)
+      if (aggregation === 'sum') grouped[key] += val
       else if (aggregation === 'avg') grouped[key] = (grouped[key] + val) / 2
       else if (aggregation === 'max') grouped[key] = Math.max(grouped[key], val)
       else if (aggregation === 'min') grouped[key] = grouped[key] === 0 ? val : Math.min(grouped[key], val)
